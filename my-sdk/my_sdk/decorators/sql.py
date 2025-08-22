@@ -6,6 +6,7 @@ from airflow.sdk.definitions._internal.types import SET_DURING_EXECUTION
 from airflow.utils.context import context_merge
 from airflow.utils.operator_helpers import determine_kwargs
 from airflow.sdk.definitions.context import Context
+from airflow.sdk.bases.decorator import TaskDecorator,task_decorator_factory
 import warnings
 
 
@@ -62,3 +63,8 @@ class _SQLDecoratedOperator(DecoratedOperator, SQLExecuteQueryOperator):
         context["ti"].render_templates()
 
         return super().execute(context)
+
+def sql_task(python_callable: Callable | None = None, **kwargs) -> TaskDecorator:
+    return task_decorator_factory(python_callable, 
+                                  decorated_operator_class=_SQLDecoratedOperator, 
+                                  **kwargs))
